@@ -30,3 +30,15 @@ cat <<EOF > ../website/data/metrics.json
   "nginx": "$NGINX_STATUS"
 }
 EOF
+
+cat <<EOF > /usr/share/nginx/html/data/metrics.json
+{
+  "hostname": "$HOSTNAME",
+  "current_time": "$CURRENT_TIME",
+  "uptime": "$UPTIME",
+  "memory": "${MEMORY_USAGE}%",
+  "disk": "${DISK_USAGE}%",
+  "docker": "$DOCKER_STATUS",
+  "nginx": "$NGINX_STATUS"
+}
+EOF
