@@ -1,0 +1,7 @@
+{
+  "hostname": "Gaurav",
+  "memory": 10,
+  "disk": 1,
+  "docker": "inactive",
+  "nginx": "inactive"
+}
