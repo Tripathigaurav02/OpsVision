@@ -24,8 +24,8 @@ cat <<EOF > ../website/data/metrics.json
   "hostname": "$HOSTNAME",
   "Current Time": "$CURRENT_TIME",
   "Uptime": "$UPTIME",
-  "memory": $MEMORY_USAGE,
-  "disk": $DISK_USAGE,
+  "memory": ${MEMORY_USAGE}%,
+  "disk": ${DISK_USAGE}%,
   "docker": "$DOCKER_STATUS",
   "nginx": "$NGINX_STATUS"
 }
