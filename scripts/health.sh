@@ -3,7 +3,7 @@
 HOSTNAME=$(hostname)
 CURRENT_TIME=$(date)
 UPTIME=$(uptime -p)
-#CPU=$(top)
+CPU=$(top -bn1 | grep "%Cpu(s):" | awk '{print 100-$8}')
 MEMORY_USAGE=$(free | awk '/Mem:/ {printf "%d\n", $3/$2*100}'
 )
 DISK_USAGE=$(df -h / | awk 'NR==2 {print $5}' | tr -d '%'
@@ -23,6 +23,7 @@ cat <<EOF > ../website/data/metrics.json
 {
   "hostname": "$HOSTNAME",
   "current_time": "$CURRENT_TIME",
+  "cpu": "$CPU",
   "uptime": "$UPTIME",
   "memory": "${MEMORY_USAGE}%",
   "disk": "${DISK_USAGE}%",
@@ -35,6 +36,7 @@ cat <<EOF > /usr/share/nginx/html/data/metrics.json
 {
   "hostname": "$HOSTNAME",
   "current_time": "$CURRENT_TIME",
+  "cpu": "$CPU",
   "uptime": "$UPTIME",
   "memory": "${MEMORY_USAGE}%",
   "disk": "${DISK_USAGE}%",
