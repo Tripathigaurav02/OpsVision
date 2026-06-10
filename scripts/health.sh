@@ -4,8 +4,10 @@ HOSTNAME=$(hostname)
 CURRENT_TIME=$(date)
 UPTIME=$(uptime -p)
 #CPU=$(top)
-MEMORY_USAGE=$(free -h)
-DISK_USAGE=$(df -h)
+MEMORY_USAGE=$(free | awk '/Mem:/ {printf "%d\n", $3/$2*100}'
+)
+DISK_USAGE=$(df -h / | awk 'NR==2 {print $5}' | tr -d '%'
+)
 DOCKER_STATUS=$(systemctl is-active docker)
 NGINX_STATUS=$(systemctl is-active nginx)
 
