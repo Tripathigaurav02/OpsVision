@@ -141,7 +141,9 @@ Disk
 <script>
 async function loadMetrics(){
 try{
-const r=await fetch('data/metrics.json');
+const r = await fetch(
+    'data/metrics.json?t=' + Date.now()
+);
 const d=await r.json();
 
 for(const k of ['cpu','memory','disk','docker','nginx','uptime']){
