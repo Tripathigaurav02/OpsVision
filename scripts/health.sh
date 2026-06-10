@@ -23,7 +23,7 @@ cat <<EOF > ../website/data/metrics.json
 {
   "hostname": "$HOSTNAME",
   "current_time": "$CURRENT_TIME",
-  "cpu": "$CPU",
+  "cpu": "${CPU}%",
   "uptime": "$UPTIME",
   "memory": "${MEMORY_USAGE}%",
   "disk": "${DISK_USAGE}%",
@@ -36,7 +36,7 @@ cat <<EOF > /usr/share/nginx/html/data/metrics.json
 {
   "hostname": "$HOSTNAME",
   "current_time": "$CURRENT_TIME",
-  "cpu": "$CPU",
+  "cpu": "${CPU}%",
   "uptime": "$UPTIME",
   "memory": "${MEMORY_USAGE}%",
   "disk": "${DISK_USAGE}%",
