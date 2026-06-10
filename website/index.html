@@ -36,6 +36,7 @@
 
         <p><b>Hostname:</b> <span id="hostname">Loading...</span></p>
         <p><b>Current Time:</b> <span id="current_time">Loading...</span></p>
+        <p><b>CPU:</b> <span id="cpu">Loading...</span></p>
         <p><b>Uptime:</b> <span id="uptime">Loading...</span></p>
         <p><b>Memory Usage:</b> <span id="memory">Loading...</span></p>
         <p><b>Disk Usage:</b> <span id="disk">Loading...</span></p>
@@ -53,6 +54,7 @@
                 document.getElementById('hostname').textContent = data.hostname;
                 document.getElementById('current_time').textContent = data.current_time;
                 document.getElementById('uptime').textContent = data.uptime;
+                document.getElementById('cpu').textContent = data.cpu;
                 document.getElementById('memory').textContent = data.memory;
                 document.getElementById('disk').textContent = data.disk;
                 document.getElementById('docker').textContent = data.docker;
