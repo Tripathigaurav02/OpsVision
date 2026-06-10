@@ -1,71 +1,435 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>OpsVision Dashboard</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpsVision Enhanced</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,sans-serif}
+body{background:#08111f;color:#fff;padding:20px}
+.container{max-width:1700px;margin:auto}
+.header,.card,.panel{background:#111827;border:1px solid #1f2937;border-radius:16px}
+.header{display:flex;justify-content:space-between;padding:20px;margin-bottom:20px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin-bottom:20px}
+.card,.panel{padding:18px}
+.metric{font-size:2rem;font-weight:bold}
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-            background-color: #f4f4f4;
-        }
+/* Services = 1fr, Break Room = 2fr */
+.main{display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:15px}
 
-        h1 {
-            text-align: center;
-        }
+.panel h2{color:#38bdf8;margin-bottom:10px}
+.row{display:flex;justify-content:space-between;margin:10px 0}
+.barbg{height:10px;background:#222;border-radius:99px;overflow:hidden}
+.bar{height:100%}.cpu{background:#38bdf8}.mem{background:#9333ea}.disk{background:#facc15}
 
-        .dashboard {
-            width: 600px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-        }
+/* BREAK ROOM */
+#breakRoomGame{
+position:relative;
+width:100%;
+max-width:700px;
+height:420px;
+margin:auto;
+}
 
-        p {
-            font-size: 18px;
-        }
-    </style>
+#flappyCanvas{
+width:100%;
+height:100%;
+display:block;
+border-radius:12px;
+background:linear-gradient(#7ecbff,#dff6ff);
+}
+
+.game-overlay{
+position:absolute;
+inset:0;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+background:rgba(0,0,0,.45);
+z-index:10;
+text-align:center;
+}
+
+.game-overlay button{
+padding:10px 18px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+margin-top:12px;
+}
+
+@media(max-width:1200px){
+.main{grid-template-columns:1fr}
+#breakRoomGame{max-width:100%}
+}
+</style>
 </head>
-
 <body>
 
-    <div class="dashboard">
+<div class="container">
 
-        <h1>OpsVision Dashboard</h1>
+<div class="header">
+<div>
+<h1>🚀 OpsVision</h1>
+<div>Enhanced Dashboard</div>
+</div>
+<div id="updated">--</div>
+</div>
 
-        <p><b>Hostname:</b> <span id="hostname">Loading...</span></p>
-        <p><b>Current Time:</b> <span id="current_time">Loading...</span></p>
-        <p><b>CPU:</b> <span id="cpu">Loading...</span></p>
-        <p><b>Uptime:</b> <span id="uptime">Loading...</span></p>
-        <p><b>Memory Usage:</b> <span id="memory">Loading...</span></p>
-        <p><b>Disk Usage:</b> <span id="disk">Loading...</span></p>
-        <p><b>Docker Status:</b> <span id="docker">Loading...</span></p>
-        <p><b>Nginx Status:</b> <span id="nginx">Loading...</span></p>
+<div class="cards">
+<div class="card"><h3>CPU</h3><div id="cpu" class="metric">--</div></div>
+<div class="card"><h3>Memory</h3><div id="memory" class="metric">--</div></div>
+<div class="card"><h3>Disk</h3><div id="disk" class="metric">--</div></div>
+<div class="card"><h3>Docker</h3><div id="docker" class="metric">--</div></div>
+<div class="card"><h3>Nginx</h3><div id="nginx" class="metric">--</div></div>
+<div class="card"><h3>Uptime</h3><div id="uptime">--</div></div>
+</div>
 
-    </div>
+<div class="main">
 
-    <script>
+<div class="panel">
+<h2>System Info</h2>
+<div class="row"><span id="hostname">Server</span></div>
+<div class="row"><span>AWS EC2</span></div>
+<div class="row"><span id="current_time"></span></div>
+</div>
 
-        fetch('data/metrics.json')
-            .then(response => response.json())
-            .then(data => {
+<div class="panel">
+<h2>Resources</h2>
+CPU
+<div class="barbg"><div id="cpuBar" class="bar cpu"></div></div>
+<br>
+Memory
+<div class="barbg"><div id="memoryBar" class="bar mem"></div></div>
+<br>
+Disk
+<div class="barbg"><div id="diskBar" class="bar disk"></div></div>
+</div>
 
-                document.getElementById('hostname').textContent = data.hostname;
-                document.getElementById('current_time').textContent = data.current_time;
-                document.getElementById('uptime').textContent = data.uptime;
-                document.getElementById('cpu').textContent = data.cpu;
-                document.getElementById('memory').textContent = data.memory;
-                document.getElementById('disk').textContent = data.disk;
-                document.getElementById('docker').textContent = data.docker;
-                document.getElementById('nginx').textContent = data.nginx;
+<div class="panel">
+<h2>Services</h2>
+<div id="dockerStatus"></div>
+<div id="nginxStatus"></div>
+</div>
 
-            })
-            .catch(error => {
-                console.error('Error loading metrics:', error);
-            });
+<div class="panel">
+<h2>🎮 Break Room</h2>
 
-    </script>
+<div id="breakRoomGame">
+
+<canvas id="flappyCanvas"></canvas>
+
+<div id="gameOverlay" class="game-overlay">
+<h3>Flappy DevOps Bird</h3>
+<p>First obstacle appears after 3 seconds</p>
+<button onclick="startGame()">Start</button>
+</div>
+
+<div id="gameOverOverlay" class="game-overlay" style="display:none;">
+<h3>Game Over</h3>
+<p id="finalScore">Score: 0</p>
+<button onclick="restartGame()">Restart</button>
+</div>
+
+</div>
+</div>
+
+</div>
+</div>
+
+<script>
+async function loadMetrics(){
+try{
+const r=await fetch('data/metrics.json');
+const d=await r.json();
+
+for(const k of ['cpu','memory','disk','docker','nginx','uptime']){
+document.getElementById(k).innerText=d[k]||'--';
+}
+
+hostname.innerText=d.hostname||'';
+current_time.innerText=d.current_time||'';
+updated.innerText=d.current_time||'';
+
+dockerStatus.innerText='Docker: '+(d.docker||'');
+nginxStatus.innerText='Nginx: '+(d.nginx||'');
+
+cpuBar.style.width=parseInt(d.cpu||0)+'%';
+memoryBar.style.width=parseInt(d.memory||0)+'%';
+diskBar.style.width=parseInt(d.disk||0)+'%';
+
+}catch(e){}
+}
+
+loadMetrics();
+setInterval(loadMetrics,5000);
+
+/* GAME */
+
+const canvas=document.getElementById("flappyCanvas");
+const ctx=canvas.getContext("2d");
+
+const game={
+running:false,
+gameOver:false,
+animationId:null,
+pipeTimer:null,
+score:0,
+
+bird:{
+x:110,
+y:180,
+radius:16,
+velocity:0
+},
+
+gravity:0.45,
+jumpForce:-8.5,
+
+pipes:[],
+
+pipeWidth:70,
+pipeGap:150,
+pipeSpeed:2.8
+};
+
+function resizeCanvas(){
+canvas.width=canvas.clientWidth;
+canvas.height=canvas.clientHeight;
+}
+resizeCanvas();
+window.addEventListener("resize",resizeCanvas);
+
+function resetGameState(){
+game.score=0;
+game.pipes=[];
+game.gameOver=false;
+
+game.bird.x=110;
+game.bird.y=canvas.height/2;
+game.bird.velocity=0;
+}
+
+function stopGame(){
+game.running=false;
+
+if(game.animationId){
+cancelAnimationFrame(game.animationId);
+game.animationId=null;
+}
+
+if(game.pipeTimer){
+clearInterval(game.pipeTimer);
+game.pipeTimer=null;
+}
+}
+
+function startPipeGenerator(){
+if(game.pipeTimer) return;
+
+game.pipeTimer=setInterval(()=>{
+
+if(!game.running||game.gameOver) return;
+
+const minTop=50;
+const maxTop=canvas.height-180-game.pipeGap;
+
+const topHeight=Math.floor(Math.random()*(maxTop-minTop+1))+minTop;
+
+game.pipes.push({
+x:canvas.width+game.pipeWidth,
+topHeight,
+passed:false
+});
+
+},2200);
+}
+
+function startGame(){
+
+stopGame();
+resetGameState();
+
+document.getElementById("gameOverlay").style.display="none";
+document.getElementById("gameOverOverlay").style.display="none";
+
+game.running=true;
+
+setTimeout(()=>{
+if(game.running&&!game.gameOver){
+startPipeGenerator();
+}
+},3000);
+
+gameLoop();
+}
+
+function restartGame(){
+
+stopGame();
+resetGameState();
+
+document.getElementById("gameOverOverlay").style.display="none";
+
+game.running=true;
+
+setTimeout(()=>{
+if(game.running&&!game.gameOver){
+startPipeGenerator();
+}
+},3000);
+
+gameLoop();
+}
+
+function endGame(){
+
+game.gameOver=true;
+
+stopGame();
+
+document.getElementById("finalScore").textContent="Score: "+game.score;
+document.getElementById("gameOverOverlay").style.display="flex";
+}
+
+function jump(){
+if(!game.running||game.gameOver) return;
+game.bird.velocity=game.jumpForce;
+}
+
+document.addEventListener("keydown",(e)=>{
+if(e.code==="Space"){
+e.preventDefault();
+jump();
+}
+});
+
+canvas.addEventListener("click",jump);
+
+function drawBird(){
+
+const b=game.bird;
+
+ctx.save();
+ctx.translate(b.x,b.y);
+
+ctx.fillStyle="#FFD54A";
+ctx.beginPath();
+ctx.arc(0,0,b.radius,0,Math.PI*2);
+ctx.fill();
+
+ctx.fillStyle="#F4C430";
+ctx.beginPath();
+ctx.ellipse(-4,4,8,5,0,0,Math.PI*2);
+ctx.fill();
+
+ctx.fillStyle="orange";
+ctx.beginPath();
+ctx.moveTo(b.radius-2,0);
+ctx.lineTo(b.radius+12,-5);
+ctx.lineTo(b.radius+12,5);
+ctx.closePath();
+ctx.fill();
+
+ctx.fillStyle="#000";
+ctx.beginPath();
+ctx.arc(5,-5,2.5,0,Math.PI*2);
+ctx.fill();
+
+ctx.restore();
+}
+
+function drawPipes(){
+
+ctx.fillStyle="#2E8B57";
+
+game.pipes.forEach(pipe=>{
+
+const bottomY=pipe.topHeight+game.pipeGap;
+
+ctx.fillRect(pipe.x,0,game.pipeWidth,pipe.topHeight);
+
+ctx.fillRect(
+pipe.x,
+bottomY,
+game.pipeWidth,
+canvas.height-bottomY
+);
+
+});
+}
+
+function updateBird(){
+
+const b=game.bird;
+
+b.velocity+=game.gravity;
+b.y+=b.velocity;
+
+if(b.y-b.radius<=0) endGame();
+if(b.y+b.radius>=canvas.height) endGame();
+}
+
+function updatePipes(){
+
+const b=game.bird;
+
+for(const pipe of game.pipes){
+
+pipe.x-=game.pipeSpeed;
+
+if(!pipe.passed&&pipe.x+game.pipeWidth<b.x){
+pipe.passed=true;
+game.score++;
+}
+
+const inX=
+b.x+b.radius>pipe.x &&
+b.x-b.radius<pipe.x+game.pipeWidth;
+
+const hitTop=b.y-b.radius<pipe.topHeight;
+
+const hitBottom=
+b.y+b.radius>
+pipe.topHeight+game.pipeGap;
+
+if(inX&&(hitTop||hitBottom)){
+endGame();
+return;
+}
+}
+
+game.pipes=game.pipes.filter(
+p=>p.x+game.pipeWidth>-10
+);
+}
+
+function render(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+drawPipes();
+drawBird();
+
+ctx.fillStyle="#fff";
+ctx.font="bold 26px Segoe UI";
+ctx.fillText("Score: "+game.score,20,40);
+}
+
+function gameLoop(){
+
+if(!game.running) return;
+
+updateBird();
+updatePipes();
+render();
+
+if(game.running){
+game.animationId=requestAnimationFrame(gameLoop);
+}
+}
+</script>
 
 </body>
 </html>
