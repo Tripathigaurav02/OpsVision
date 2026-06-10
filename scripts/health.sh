@@ -22,8 +22,8 @@ NGINX_STATUS=$(systemctl is-active nginx)
 cat <<EOF > ../website/data/metrics.json
 {
   "hostname": "$HOSTNAME",
-  "Current Time": "$CURRENT_TIME",
-  "Uptime": "$UPTIME",
+  "current_Time": "$CURRENT_TIME",
+  "uptime": "$UPTIME",
   "memory": "${MEMORY_USAGE}%",
   "disk": "${DISK_USAGE}%",
   "docker": "$DOCKER_STATUS",
