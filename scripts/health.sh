@@ -22,7 +22,7 @@ NGINX_STATUS=$(systemctl is-active nginx)
 cat <<EOF > ../website/data/metrics.json
 {
   "hostname": "$HOSTNAME",
-  "current_Time": "$CURRENT_TIME",
+  "current_time": "$CURRENT_TIME",
   "uptime": "$UPTIME",
   "memory": "${MEMORY_USAGE}%",
   "disk": "${DISK_USAGE}%",
