@@ -21,6 +21,20 @@ body{background:#08111f;color:#fff;padding:20px}
 .row{display:flex;justify-content:space-between;margin:10px 0}
 .barbg{height:10px;background:#222;border-radius:99px;overflow:hidden}
 .bar{height:100%}.cpu{background:#38bdf8}.mem{background:#9333ea}.disk{background:#facc15}
+.status-green{
+    border:2px solid #22c55e;
+    box-shadow:0 0 12px rgba(34,197,94,.35);
+}
+
+.status-yellow{
+    border:2px solid #facc15;
+    box-shadow:0 0 12px rgba(250,204,21,.35);
+}
+
+.status-red{
+    border:2px solid #ef4444;
+    box-shadow:0 0 12px rgba(239,68,68,.35);
+}
 
 /* BREAK ROOM */
 #breakRoomGame{
@@ -78,9 +92,9 @@ margin-top:12px;
 </div>
 
 <div class="cards">
-<div class="card"><h3>CPU</h3><div id="cpu" class="metric">--</div></div>
-<div class="card"><h3>Memory</h3><div id="memory" class="metric">--</div></div>
-<div class="card"><h3>Disk</h3><div id="disk" class="metric">--</div></div>
+<div id="cpuCard" class="card"><h3>CPU</h3><div id="cpu" class="metric">--</div></div>
+<div id="memoryCard" class="card"><h3>Memory</h3><div id="memory" class="metric">--</div></div>
+<div id="diskCard" class="card"><h3>Disk</h3><div id="disk" class="metric">--</div></div>
 <div class="card"><h3>Docker</h3><div id="docker" class="metric">--</div></div>
 <div class="card"><h3>Nginx</h3><div id="nginx" class="metric">--</div></div>
 <div class="card"><h3>Uptime</h3><div id="uptime">--</div></div>
@@ -139,12 +153,49 @@ Disk
 </div>
 
 <script>
+function updateCardStatus(card,value){
+
+if(!card) return;
+
+card.classList.remove(
+    "status-green",
+    "status-yellow",
+    "status-red"
+);
+
+if(value >= 80){
+    card.classList.add("status-red");
+}
+else if(value >= 60){
+    card.classList.add("status-yellow");
+}
+else{
+    card.classList.add("status-green");
+}
+
+}
+
 async function loadMetrics(){
 try{
 const r = await fetch(
     'data/metrics.json?t=' + Date.now()
 );
 const d=await r.json();
+
+updateCardStatus(
+    document.getElementById("cpuCard"),
+    parseInt(d.cpu || 0)
+);
+
+updateCardStatus(
+    document.getElementById("memoryCard"),
+    parseInt(d.memory || 0)
+);
+
+updateCardStatus(
+    document.getElementById("diskCard"),
+    parseInt(d.disk || 0)
+);
 
 for(const k of ['cpu','memory','disk','docker','nginx','uptime']){
 document.getElementById(k).innerText=d[k]||'--';
