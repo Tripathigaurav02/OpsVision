@@ -10,16 +10,13 @@ deploy:
 runs-on: self-hosted
 
 steps:
-
   - name: Checkout Repository
     uses: actions/checkout@v4
 
   - name: Update Repository
     run: |
       cd ~/OpsVision
-
       git fetch origin
-
       git reset --hard origin/main
 
   - name: Ensure Script Permissions
@@ -38,3 +35,4 @@ steps:
     run: |
       echo "Deployment Successful"
       ls -l /usr/share/nginx/html/
+
