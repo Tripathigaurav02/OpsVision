@@ -5,3 +5,4 @@
 
 website/data/metrics.json
 website/data/alerts.log
+scripts/health.log
