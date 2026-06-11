@@ -7,8 +7,6 @@ branches:
 
 jobs:
 deploy:
-
-```
 runs-on: self-hosted
 
 steps:
@@ -40,4 +38,3 @@ steps:
     run: |
       echo "Deployment Successful"
       ls -l /usr/share/nginx/html/
-```
