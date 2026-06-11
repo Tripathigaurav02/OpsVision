@@ -1,0 +1,43 @@
+name: Deploy OpsVision
+
+on:
+push:
+branches:
+- main
+
+jobs:
+deploy:
+
+```
+runs-on: self-hosted
+
+steps:
+
+  - name: Checkout Repository
+    uses: actions/checkout@v4
+
+  - name: Update Repository
+    run: |
+      cd ~/OpsVision
+
+      git fetch origin
+
+      git reset --hard origin/main
+
+  - name: Ensure Script Permissions
+    run: |
+      chmod +x ~/OpsVision/scripts/health.sh
+
+  - name: Deploy Dashboard
+    run: |
+      sudo cp -r ~/OpsVision/website/* /usr/share/nginx/html/
+
+  - name: Validate Nginx
+    run: |
+      sudo nginx -t
+
+  - name: Deployment Verification
+    run: |
+      echo "Deployment Successful"
+      ls -l /usr/share/nginx/html/
+```
