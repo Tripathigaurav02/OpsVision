@@ -2,3 +2,6 @@
 .terraform/
 *.tfstate
 *.tfstate.*
+
+website/data/metrics.json
+website/data/alerts.log
